@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Святой Коран - Чтение и Прослушивание</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,700;1,700&family=Scheherazade+New&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --primary:#0b6b4f; /* deep green */
+            --accent:#c9a04b; /* gold */
+            --muted:#f7efe2; /* parchment */
+            --card:#fffdf8;
+            --ink:#2b2b2b;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Merriweather', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at top, rgba(11,107,79,0.08) 0%, transparent 40%), linear-gradient(180deg, #f2efe9 0%, #efe6da 100%);
+            min-height: 100vh;
+            padding: 28px;
+            color: var(--ink);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--muted);
+            border-radius: 14px;
+            box-shadow: 0 18px 40px rgba(11,107,79,0.08);
+            overflow: hidden;
+            border: 1px solid rgba(201,160,75,0.12);
+        }
+
+        .header {
+            background: linear-gradient(180deg, var(--primary) 0%, rgba(11,107,79,0.9) 60%);
+            color: var(--muted);
+            padding: 48px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header:before{
+            content: '';
+            position: absolute;
+            left: 0; right: 0; top: 0; bottom: -30px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 200"><g fill="%23ffffff" opacity="0.04"><path d="M0 160 Q150 60 300 160 T600 160 T900 160 T1200 160 L1200 200 L0 200 Z"/></g></svg>');
+            background-repeat: no-repeat;
+            background-position: center bottom;
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-family: 'Scheherazade New', serif;
+            font-size: 2.6em;
+            margin-bottom: 6px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+        }
+
+        .header p {
+            font-size: 1.05em;
+            opacity: 0.95;
+            color: rgba(255,255,255,0.95);
+        }
+
+        .surahs-selector {
+            background: transparent;
+            padding: 18px 22px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-section {
+            padding: 10px 22px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-top: 1px dashed rgba(11,107,79,0.04);
+            background: transparent;
+        }
+
+        .btn-ghost{
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(201,160,75,0.02));
+            border: 2px solid rgba(201,160,75,0.22);
+            color: var(--primary);
+            padding: 9px 16px;
+            border-radius: 999px;
+            box-shadow: 0 8px 20px rgba(11,107,79,0.04);
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+            position: relative;
+        }
+
+        .btn-ghost:before{
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 2px;
+            display: inline-block;
+            margin-left: 4px;
+            box-shadow: 0 2px 6px rgba(11,107,79,0.06);
+        }
+
+        .btn-ghost:hover{
+            transform: translateY(-3px);
+            box-shadow: 0 18px 40px rgba(11,107,79,0.10);
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(201,160,75,0.06));
+        }
+
+        .surahs-selector label {
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .surahs-selector select {
+            padding: 10px 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            background: white;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .surahs-selector select:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 0.95em;
+            min-width: 200px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .surahs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            padding: 14px 20px;
+            background: transparent;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .surah-card {
+            background: var(--card);
+            border: 1px solid rgba(201,160,75,0.18);
+            border-radius: 10px;
+            padding: 14px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            font-size: 0.95em;
+            box-shadow: 0 6px 18px rgba(11,107,79,0.04);
+        }
+
+        .surah-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(11,107,79,0.08);
+            border-color: rgba(201,160,75,0.28);
+        }
+
+        .surah-card.active {
+            background: linear-gradient(180deg, rgba(11,107,79,0.98), rgba(11,107,79,0.9));
+            color: white;
+            border-color: rgba(201,160,75,0.28);
+        }
+
+        .surah-card-number {
+            display: block;
+            font-weight: 700;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .surah-card-name {
+            display: block;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-family: 'Scheherazade New', serif;
+        }
+
+        .surah-card-meaning {
+            display: block;
+            font-size: 0.75em;
+            color: #666;
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        .surah-card.active .surah-card-meaning {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 620px;
+            padding-bottom: 30px;
+        }
+
+        .hidden { display: none !important; }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .controls {
+            background: rgba(255,255,255,0.6);
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            flex-wrap: wrap;
+            border: 1px solid rgba(11,107,79,0.04);
+        }
+
+        .controls label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .controls select {
+            padding: 8px 12px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 0.95em;
+            cursor: pointer;
+            background: white;
+        }
+
+        .youtube-link {
+            margin-top: 15px;
+        }
+
+        .youtube-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #ff0000;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .youtube-link a:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .btn {
+            padding: 10px 22px;
+            background: linear-gradient(180deg, #fff4d6 0%, var(--accent) 70%);
+            color: var(--primary);
+            border: 2px solid rgba(11,107,79,0.12);
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.96em;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+            font-weight: 700;
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.04), 0 10px 26px rgba(11,107,79,0.06);
+            position: relative;
+            overflow: visible;
+            letter-spacing: 0.4px;
+        }
+
+        .btn:before,
+        .btn:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(201,160,75,0.9));
+            box-shadow: 0 2px 6px rgba(11,107,79,0.06);
+            border-radius: 2px;
+            opacity: 0.95;
+        }
+
+        .btn:before { left: 10px; }
+        .btn:after { right: 10px; }
+
+        .btn:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 18px 40px rgba(11,107,79,0.12), inset 0 -6px 0 rgba(0,0,0,0.05);
+            background: linear-gradient(180deg, #fff7e0 0%, #d6b45a 70%);
+        }
+
+        .btn:active{
+            transform: translateY(-1px) scale(0.995);
+            box-shadow: 0 8px 20px rgba(11,107,79,0.08) inset;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .surah-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .surah-title h2 {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .surah-info {
+            text-align: center;
+            color: #666;
+            font-size: 0.95em;
+            margin-top: 10px;
+        }
+
+        .surah-info span {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 5px 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .ayahs-container {
+            line-height: 2;
+            font-size: 1.1em;
+        }
+
+        .ayah {
+            margin-bottom: 26px;
+            padding: 18px;
+            background: transparent;
+            border-left: 6px solid rgba(201,160,75,0.22);
+            border-radius: 6px;
+            transition: background 0.2s ease, transform 0.18s ease;
+        }
+
+        .ayah:hover {
+            background: rgba(11,107,79,0.03);
+            transform: translateY(-4px);
+        }
+
+        .ayah-arabic {
+            color: #0b3f33;
+            margin-bottom: 10px;
+            font-size: 1.35em;
+            text-align: right;
+            direction: rtl;
+            font-weight: 600;
+            font-family: 'Scheherazade New', serif;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+        }
+
+        .ayah-russian {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 1em;
+            text-align: left;
+            direction: ltr;
+            line-height: 1.6;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border-left: 3px solid #764ba2;
+        }
+
+        .ayah-transcription {
+            color: #4b4b4b;
+            margin-bottom: 10px;
+            font-size: 0.98em;
+            text-align: left;
+            direction: ltr;
+            font-style: italic;
+            padding: 10px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 6px;
+            border: 1px dashed rgba(11,107,79,0.04);
+        }
+
+        .ayah-pronunciation {
+            color: #2b2b2b;
+            margin-bottom: 10px;
+            font-size: 1em;
+            text-align: left;
+            direction: ltr;
+            padding: 12px;
+            background: linear-gradient(90deg, rgba(201,160,75,0.06), rgba(255,255,255,0.6));
+            border-radius: 6px;
+            border-left: 4px solid var(--accent);
+            font-style: normal;
+        }
+
+        .ayah-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: 600;
+            margin-left: 10px;
+            font-size: 0.85em;
+        }
+
+        .placeholder {
+            text-align: center;
+            color: #999;
+            padding: 50px 20px;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #999;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width:768px){
+
+body{
+    padding:10px;
+}
+
+.container{
+    border-radius:0;
+}
+
+.header{
+    padding:25px 15px;
+}
+
+.header h1{
+    font-size:1.7rem;
+}
+
+.header p{
+    font-size:0.95rem;
+}
+
+.surahs-selector,
+.search-section,
+.controls{
+    flex-direction:column;
+    align-items:stretch;
+    padding:15px;
+}
+
+.surahs-selector label,
+.search-section label{
+    margin-bottom:6px;
+}
+
+.surahs-selector select,
+.search-box,
+.controls select,
+.btn,
+.btn-ghost{
+    width:100%;
+    min-width:0;
+}
+
+.surahs-grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    padding:10px;
+}
+
+.surah-card{
+    padding:12px;
+}
+
+.content-area{
+    padding:12px;
+}
+
+.tabs{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+    border:none;
+}
+
+.tab-btn{
+    width:100%;
+    border-radius:10px;
+    border:2px solid #ddd;
+}
+
+.surah-title h2{
+    font-size:1.5rem;
+}
+
+.surah-info{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.surah-info span{
+    margin:0;
+}
+
+.ayah{
+    padding:14px;
+}
+
+.ayah-arabic{
+    font-size:1.9rem;
+    line-height:2.1;
+}
+
+.ayah-transcription,
+.ayah-pronunciation{
+    font-size:.95rem;
+}
+
+.ayah-number{
+    width:30px;
+    height:30px;
+    line-height:30px;
+    font-size:.75rem;
+}
+
+audio{
+    width:100%;
+}
+}
+
+        .footer {
+            background: transparent;
+            padding: 28px 20px;
+            text-align: center;
+            color: #5b5b5b;
+            border-top: 1px solid rgba(11,107,79,0.04);
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📖СУРЫ ИЗ QURAN</h1>
+            <p>Чтение и прослушивание CУР!</p>
+        </div>
+
+        <div class="surahs-selector">
+            <label for="surahSelect">Выберите суру:</label>
+            <select id="surahSelect" onchange="selectSurahFromDropdown(this.value)">
+                <option value="">-- Все суры --</option>
+            </select>
+            <button id="showAllSurahsBtn" class="btn btn-ghost" onclick="showAllSurahs()">ВСЕ СУРЫ</button>
+        </div>
+
+        <div class="search-section">
+            <label for="searchInput">Поиск:</label>
+            <input type="text" id="searchInput" class="search-box" placeholder="Поиск по названию суры...">
+        </div>
+
+        <div class="surahs-grid" id="surahsGrid"></div>
+
+        <div class="main-content hidden" id="mainContent">
+            <div class="content-area">
+                <div id="errorMessage"></div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="reading">🔖 Чтение</button>
+                    <button class="tab-btn" data-tab="listen">🔊 Прослушивание</button>
+                    <button class="tab-btn" data-tab="info">ℹ️ Информация</button>
+                </div>
+
+                <div id="reading" class="tab-content active">
+                    <div id="surahContainer" class="placeholder">
+                        Выберите суру из списка выше
+                    </div>
+                </div>
+
+                <div id="listen" class="tab-content">
+                    <div class="controls">
+                        <label for="reciterSelect">Выберите чтеца:</label>
+                        <select id="reciterSelect" onchange="changeReciter()">
+                            <option value="ar.alafasy">Мишари аль-Афаси</option>
+                            <option value="ar.abdulbasitmurattal">Абд аль-Басит - мурраттал</option>
+                            <option value="ar.abdulbasitmujawwad">Абд аль-Басит - муджаввад</option>
+                            <option value="ar.minshawi">Махмуд аль-Хасари</option>
+                        </select>
+                    </div>
+                    <div id="playerContainer"></div>
+                    <div id="youtubeContainer" class="youtube-link"></div>
+                </div>
+
+                <div id="info" class="tab-content">
+                    <div id="surahInfo"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>СОЗДАТЕЛЬ ДАННОГО САЙТА AMONOV.J</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Данные из API Quran.com</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://api.quran.com/api/v4';
+        let currentSurah = null;
+        let currentReciter = 'ar.alafasy';
+        let allSurahs = [];
+        let russianTranslation = null;
+        let currentTranslitMap = {};
+        let currentArabicVerses = [];
+        let currentTranslationMapGlobal = {};
+        let currentPronAllShown = false;
+
+        // Русские названия и произношение сур
+        const surahsData = {
+            1: { name: 'аль-Фатиха', translit: 'Al-Fatiha', meaning: 'Открывающая' },
+            2: { name: 'аль-Бакара', translit: 'Al-Baqarah', meaning: 'Корова' },
+            3: { name: 'Али Имран', translit: 'Ali \'Imran', meaning: 'Семейство Имрана' },
+            4: { name: 'ан-Ниса', translit: 'An-Nisa', meaning: 'Женщины' },
+            5: { name: 'аль-Маида', translit: 'Al-Maidah', meaning: 'Трапеза' },
+            6: { name: 'аль-Анам', translit: 'Al-An\'am', meaning: 'Скот' },
+            7: { name: 'аль-Араф', translit: 'Al-A\'raf', meaning: 'Преграды' },
+            8: { name: 'аль-Анфаль', translit: 'Al-Anfal', meaning: 'Добыча' },
+            9: { name: 'ат-Тауба', translit: 'At-Tawbah', meaning: 'Раскаяние' },
+            10: { name: 'Йунус', translit: 'Yunus', meaning: 'Иона' },
+            11: { name: 'Худ', translit: 'Hud', meaning: 'Худ' },
+            12: { name: 'Йусуф', translit: 'Yusuf', meaning: 'Йусуф' },
+            13: { name: 'ар-Раад', translit: 'Ar-Ra\'d', meaning: 'Гром' },
+            14: { name: 'Ибрахим', translit: 'Ibrahim', meaning: 'Авраам' },
+            15: { name: 'аль-Хиджр', translit: 'Al-Hijr', meaning: 'Скалистая местность' },
+            16: { name: 'ан-Нахль', translit: 'An-Nahl', meaning: 'Пчела' },
+            17: { name: 'аль-Исра', translit: 'Al-Isra', meaning: 'Ночное путешествие' },
+            18: { name: 'аль-Кахф', translit: 'Al-Kahf', meaning: 'Пещера' },
+            19: { name: 'Марьям', translit: 'Maryam', meaning: 'Мария' },
+            20: { name: 'Та-Ха', translit: 'Ta-Ha', meaning: 'Та Ха' },
+            21: { name: 'аль-Анбия', translit: 'Al-Anbiya', meaning: 'Пророки' },
+            22: { name: 'аль-Хаджж', translit: 'Al-Hajj', meaning: 'Паломничество' },
+            23: { name: 'аль-Муминун', translit: 'Al-Mu\'minun', meaning: 'Верующие' },
+            24: { name: 'ан-Нур', translit: 'An-Nur', meaning: 'Свет' },
+            25: { name: 'аль-Фуркан', translit: 'Al-Furqan', meaning: 'Различение' },
+            26: { name: 'аш-Шуара', translit: 'Ash-Shu\'ara', meaning: 'Поэты' },
+            27: { name: 'ан-Намль', translit: 'An-Naml', meaning: 'Муравьи' },
+            28: { name: 'аль-Касас', translit: 'Al-Qasas', meaning: 'Рассказы' },
+            29: { name: 'аль-Анкабут', translit: 'Al-\'Ankabut', meaning: 'Паук' },
+            30: { name: 'ар-Рум', translit: 'Ar-Rum', meaning: 'Римляне' },
+            31: { name: 'Люкман', translit: 'Luqman', meaning: 'Люкман' },
+            32: { name: 'ас-Саджда', translit: 'As-Sajdah', meaning: 'Земной поклон' },
+            33: { name: 'аль-Ахзаб', translit: 'Al-Ahzab', meaning: 'Союзники' },
+            34: { name: 'Саба', translit: 'Saba', meaning: 'Сава' },
+            35: { name: 'Фатир', translit: 'Fatir', meaning: 'Творец' },
+            36: { name: 'Йа-Син', translit: 'Ya-Sin', meaning: 'Йа Син' },
+            37: { name: 'ас-Саффат', translit: 'As-Saffat', meaning: 'Стоящие в ряду' },
+            38: { name: 'Сад', translit: 'Sad', meaning: 'Сад' },
+            39: { name: 'аз-Зумар', translit: 'Az-Zumar', meaning: 'Толпы' },
+            40: { name: 'Гафир', translit: 'Ghafir', meaning: 'Прощающий' },
+            41: { name: 'Фуссилат', translit: 'Fussilat', meaning: 'Разъяснённые' },
+            42: { name: 'аш-Шура', translit: 'Ash-Shura', meaning: 'Совещание' },
+            43: { name: 'аз-Зухруф', translit: 'Az-Zukhruf', meaning: 'Украшение' },
+            44: { name: 'ад-Духан', translit: 'Ad-Dukhan', meaning: 'Дым' },
+            45: { name: 'аль-Джасия', translit: 'Al-Jathiyah', meaning: 'Преклоняющаяся' },
+            46: { name: 'аль-Ахкаф', translit: 'Al-Ahqaf', meaning: 'Пески' },
+            47: { name: 'Мухаммад', translit: 'Muhammad', meaning: 'Мухаммад' },
+            48: { name: 'аль-Фатх', translit: 'Al-Fath', meaning: 'Победа' },
+            49: { name: 'аль-Худжурат', translit: 'Al-Hujurat', meaning: 'Покои' },
+            50: { name: 'Каф', translit: 'Qaf', meaning: 'Каф' },
+            51: { name: 'аз-Зарийат', translit: 'Adh-Dhariyat', meaning: 'Развевающиеся' },
+            52: { name: 'ат-Тур', translit: 'At-Tur', meaning: 'Гора' },
+            53: { name: 'ан-Наджм', translit: 'An-Najm', meaning: 'Звезда' },
+            54: { name: 'аль-Камар', translit: 'Al-Qamar', meaning: 'Луна' },
+            55: { name: 'ар-Рахман', translit: 'Ar-Rahman', meaning: 'Милостивый' },
+            56: { name: 'аль-Вакиа', translit: 'Al-Waqi\'ah', meaning: 'Неизбежное событие' },
+            57: { name: 'аль-Хадид', translit: 'Al-Hadid', meaning: 'Железо' },
+            58: { name: 'аль-Муджадала', translit: 'Al-Mujadalah', meaning: 'Пререкание' },
+            59: { name: 'аль-Хашр', translit: 'Al-Hashr', meaning: 'Сбор' },
+            60: { name: 'аль-Мумтахина', translit: 'Al-Mumtahanah', meaning: 'Испытуемая' },
+            61: { name: 'ас-Сафф', translit: 'As-Saff', meaning: 'Ряд' },
+            62: { name: 'аль-Джума', translit: 'Al-Jumu\'ah', meaning: 'Пятница' },
+            63: { name: 'аль-Мунафикун', translit: 'Al-Munafiqun', meaning: 'Лицемеры' },
+            64: { name: 'ат-Тагабун', translit: 'At-Taghabun', meaning: 'Взаимное разоблачение' },
+            65: { name: 'ат-Талак', translit: 'At-Talaq', meaning: 'Развод' },
+            66: { name: 'ат-Тахрим', translit: 'At-Tahrim', meaning: 'Запрет' },
+            67: { name: 'аль-Мульк', translit: 'Al-Mulk', meaning: 'Власть' },
+            68: { name: 'аль-Калам', translit: 'Al-Qalam', meaning: 'Перо' },
+            69: { name: 'аль-Хакка', translit: 'Al-Haqqah', meaning: 'Неминуемая' },
+            70: { name: 'аль-Мааридж', translit: 'Al-Ma\'arij', meaning: 'Ступени' },
+            71: { name: 'Нух', translit: 'Nuh', meaning: 'Ной' },
+            72: { name: 'аль-Джинн', translit: 'Al-Jinn', meaning: 'Джинны' },
+            73: { name: 'аль-Муззаммиль', translit: 'Al-Muzzammil', meaning: 'Завёрнутый' },
+            74: { name: 'аль-Мудассир', translit: 'Al-Muddaththir', meaning: 'Укутанный' },
+            75: { name: 'аль-Киёма', translit: 'Al-Qiyamah', meaning: 'Воскресение' },
+            76: { name: 'аль-Инсан', translit: 'Al-Insan', meaning: 'Человек' },
+            77: { name: 'аль-Мурсалат', translit: 'Al-Mursalat', meaning: 'Посланные' },
+            78: { name: 'ан-Наба', translit: 'An-Naba', meaning: 'Весть' },
+            79: { name: 'ан-Назиат', translit: 'An-Nazi\'at', meaning: 'Вырывающие' },
+            80: { name: 'Абаса', translit: 'Abasa', meaning: 'Нахмурился' },
+            81: { name: 'ат-Такви́р', translit: 'At-Takwir', meaning: 'Завёртывание' },
+            82: { name: 'аль-Инфитар', translit: 'Al-Infitar', meaning: 'Раскалывание' },
+            83: { name: 'аль-Муттаффифин', translit: 'Al-Mutaffifin', meaning: 'Обмеривающие' },
+            84: { name: 'аль-Иншикак', translit: 'Al-Inshiqaq', meaning: 'Расселина' },
+            85: { name: 'аль-Буруджь', translit: 'Al-Buruj', meaning: 'Башни' },
+            86: { name: 'ат-Тариқ', translit: 'At-Tariq', meaning: 'Утренняя звезда' },
+            87: { name: 'аль-Аля', translit: 'Al-A\'la', meaning: 'Всевышний' },
+            88: { name: 'аль-Гашия', translit: 'Al-Ghashiyah', meaning: 'Покрывающая' },
+            89: { name: 'аль-Фаджр', translit: 'Al-Fajr', meaning: 'Заря' },
+            90: { name: 'аль-Балад', translit: 'Al-Balad', meaning: 'Город' },
+            91: { name: 'аш-Шамс', translit: 'Ash-Shams', meaning: 'Солнце' },
+            92: { name: 'аль-Лайл', translit: 'Al-Layl', meaning: 'Ночь' },
+            93: { name: 'аз-Зуха', translit: 'Ad-Duha', meaning: 'Предполуденное время' },
+            94: { name: 'аш-Шарх', translit: 'Ash-Sharh', meaning: 'Раскрытие' },
+            95: { name: 'ат-Тин', translit: 'At-Tin', meaning: 'Инжир' },
+            96: { name: 'аль-Алак', translit: 'Al-\'Alaq', meaning: 'Сгусток' },
+            97: { name: 'аль-Кадр', translit: 'Al-Qadr', meaning: 'Предопределение' },
+            98: { name: 'аль-Байина', translit: 'Al-Bayyinah', meaning: 'Ясное доказательство' },
+            99: { name: 'аз-Зилзаль', translit: 'Az-Zilzal', meaning: 'Землетрясение' },
+            100: { name: 'аль-Адийат', translit: 'Al-\'Adiyat', meaning: 'Скачущие' },
+            101: { name: 'аль-Карыа', translit: 'Al-Qari\'ah', meaning: 'Удар' },
+            102: { name: 'ат-Такасур', translit: 'At-Takathur', meaning: 'Мирское соревнование' },
+            103: { name: 'аль-Аср', translit: 'Al-\'Asr', meaning: 'Время' },
+            104: { name: 'аль-Хумаза', translit: 'Al-Humazah', meaning: 'Клеветник' },
+            105: { name: 'аль-Фил', translit: 'Al-Fil', meaning: 'Слон' },
+            106: { name: 'Курайш', translit: 'Quraysh', meaning: 'Курайшиты' },
+            107: { name: 'аль-Маун', translit: 'Al-Ma\'un', meaning: 'Обиходные вещи' },
+            108: { name: 'аль-Каусар', translit: 'Al-Kawthar', meaning: 'Изобилие' },
+            109: { name: 'аль-Кафирун', translit: 'Al-Kafiroon', meaning: 'Неверующие' },
+            110: { name: 'ан-Наср', translit: 'An-Nasr', meaning: 'Помощь' },
+            111: { name: 'аль-Масад', translit: 'Al-Masad', meaning: 'Волокна пальмы' },
+            112: { name: 'аль-Ихлас', translit: 'Al-Ikhlas', meaning: 'Чистота веры' },
+            113: { name: 'аль-Фаляк', translit: 'Al-Falaq', meaning: 'Рассвет' },
+            114: { name: 'ан-Нас', translit: 'An-Nas', meaning: 'Люди' }
+        };
+
+        // Встроенные русские переводы Корана (основные суры)
+        const translationsDB = {
+            1: {  // Аль-Фатиха
+                1: 'Во имя Аллаха, Милостивого, Милосердного!',
+                2: 'Хвала Аллаху, Господу миров,',
+                3: 'Милостивому, Милосердному,',
+                4: 'Властителю Дня Суда.',
+                5: 'Тебе одному мы поклоняемся и к Тебе одному взываем о помощи.',
+                6: 'Веди нас по прямому пути,',
+                7: 'По пути тех, кого Ты облагодетельствовал, не тех, на кого пал Твой гнев, и не заблудших.'
+            },
+            18: {  // Аль-Кахф (Пещера) - только первые 10 аятов как пример
+                1: 'Хвала Аллаху, ниспославшему рабу Своему Писание и не сделавшему в нём никаких противоречий.',
+                2: 'Оно (Писание) – прямое, чтобы предостеречь о суровом наказании от Него и обрадовать верующих, творящих добрые дела, что для них – прекрасное воздаяние,',
+                3: 'В котором они пребудут вечно,',
+                4: 'И предостеречь тех, которые говорят: "Аллах Себе подобных имеет детей".',
+                5: 'У них нет об этом никакого знания, ни у отцов их. Велико это слово, исходящее из ваших уст! Вы говорите только ложь.',
+                6: 'Быть может, ты истомишься с горести, если они не уверуют в это сказание, тосковать будешь ты по ним.',
+                7: 'Мы украсили для людей то, что на земле, дабы испытать их – кто лучше творит дела.',
+                8: 'И превратим мы то, что на ней, в пустынный прах.',
+                9: 'Или ты полагаешь, что обитатели пещеры и надписи на камне – было одним из чудес поразительных?',
+                10: 'Вот юноши прибежали в пещеру и сказали: "Господи наш! Даруй нам милость от Тебя и устрой для нас из дел наших прямой путь".'
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSurahs();
+            setupTabButtons();
+            setupSearch();
+            adjustSurahsGridHeight();
+            window.addEventListener('resize', adjustSurahsGridHeight);
+        });
+
+        async function loadSurahs() {
+            try {
+                const response = await fetch(`${API_BASE}/chapters?language=ru`);
+                const data = await response.json();
+                allSurahs = data.chapters;
+                renderSurahsList(allSurahs);
+                populateDropdown(allSurahs);
+            } catch (error) {
+                showError('Ошибка при загрузке списка сур');
+                console.error(error);
+            }
+        }
+
+        function renderSurahsList(surahs) {
+            const grid = document.getElementById('surahsGrid');
+            grid.innerHTML = '';
+            surahs.forEach(surah => {
+                const card = document.createElement('div');
+                card.className = 'surah-card';
+                const surahMeta = surahsData[surah.id] || {};
+                card.innerHTML = `
+                    <span class="surah-card-number">${surah.id}</span>
+                    <span class="surah-card-name">${surahMeta.name || surah.name_arabic}</span>
+                    ${surahMeta.meaning ? `<span class="surah-card-meaning">${surahMeta.meaning}</span>` : ''}
+                `;
+                card.onclick = () => selectSurah(surah);
+                grid.appendChild(card);
+            });
+        }
+
+        function populateDropdown(surahs) {
+            const dropdown = document.getElementById('surahSelect');
+            const option = dropdown.querySelector('option[value=""]');
+            surahs.forEach(surah => {
+                const opt = document.createElement('option');
+                const surahMeta = surahsData[surah.id] || {};
+                opt.value = surah.id;
+                opt.textContent = `${surah.id}. ${surahMeta.name || surah.name_arabic}`;
+                dropdown.appendChild(opt);
+            });
+        }
+
+        function selectSurahFromDropdown(value) {
+            if (value) {
+                const surah = allSurahs.find(s => s.id === parseInt(value));
+                if (surah) selectSurah(surah);
+            }
+        }
+
+        function setupSearch() {
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const query = (e.target.value || '').trim().toLowerCase();
+                if (!query) {
+                    renderSurahsList(allSurahs);
+                    return;
+                }
+
+                const filtered = allSurahs.filter(surah => {
+                    const meta = surahsData[surah.id] || {};
+                    const surahName = (surah.name || surah.name_arabic || '').toString();
+                    const metaName = (meta.name || '').toString();
+                    const translit = (meta.translit || '').toString();
+
+                    return (
+                        (metaName && metaName.toLowerCase().includes(query)) ||
+                        (surahName && surahName.toLowerCase().includes(query)) ||
+                        (translit && translit.toLowerCase().includes(query)) ||
+                        surah.id.toString().includes(query)
+                    );
+                });
+
+                renderSurahsList(filtered);
+            });
+        }
+
+        function showAllSurahs(){
+            const search = document.getElementById('searchInput');
+            const dropdown = document.getElementById('surahSelect');
+            if(search) search.value = '';
+            if(dropdown) dropdown.value = '';
+            renderSurahsList(allSurahs);
+            // scroll to grid
+            document.getElementById('surahsGrid')?.scrollIntoView({behavior:'smooth'});
+            // hide main content when returning to list
+            document.getElementById('mainContent')?.classList.add('hidden');
+            // adjust grid height so many surahs fit on screen
+            adjustSurahsGridHeight();
+            // remove active from cards
+            document.querySelectorAll('.surah-card').forEach(c => c.classList.remove('active'));
+        }
+
+        function adjustSurahsGridHeight(){
+            const grid = document.getElementById('surahsGrid');
+            if(!grid) return;
+            const mainContent = document.getElementById('mainContent');
+            const header = document.querySelector('.header');
+            const selector = document.querySelector('.surahs-selector');
+            const search = document.querySelector('.search-section');
+            const footer = document.querySelector('.footer');
+
+            let used = 0;
+            if(header) used += header.offsetHeight;
+            if(selector) used += selector.offsetHeight;
+            if(search) used += search.offsetHeight;
+            if(footer) used += footer.offsetHeight;
+            // extra paddings
+            used += 60;
+
+            const available = window.innerHeight - used;
+            if(mainContent && mainContent.classList.contains('hidden')){
+                grid.style.maxHeight = Math.max(120, available) + 'px';
+                grid.style.overflowY = 'auto';
+            } else {
+                // restore default
+                grid.style.maxHeight = '';
+                grid.style.overflowY = 'auto';
+            }
+        }
+
+        async function selectSurah(surah) {
+            currentSurah = surah;
+
+            // show main content
+            document.getElementById('mainContent')?.classList.remove('hidden');
+
+            // Update active card reliably
+            document.querySelectorAll('.surah-card').forEach(card => {
+                card.classList.remove('active');
+                const numEl = card.querySelector('.surah-card-number');
+                if (numEl && parseInt(numEl.textContent) === surah.id) {
+                    card.classList.add('active');
+                }
+            });
+
+            // Load content
+            await loadSurahContent(surah.id);
+            await loadSurahInfo(surah);
+            await loadAudio(surah.id);
+            loadYoutubeLink(surah);
+
+            switchTab('reading');
+        }
+
+        async function loadSurahContent(chapterNumber) {
+            try {
+                // Load Arabic text
+                const arabicRes = await fetch(`${API_BASE}/quran/verses/uthmani?chapter_number=${chapterNumber}`);
+                const arabicData = await arabicRes.json();
+                
+                // Try to load Russian translation from Quran Cloud API
+                let translationMap = translationsDB[chapterNumber] || {};
+                try {
+                    // Quran Cloud API - Russian translation (Coulson)
+                    const cloudRes = await fetch(`https://api.alquran.cloud/v1/surah/${chapterNumber}/ru.kuliev`);
+                    if (cloudRes.ok) {
+                        const cloudData = await cloudRes.json();
+                        cloudData.data?.ayahs?.forEach((ayah, idx) => {
+                            const verseNum = ayah.numberInSurah || (idx + 1);
+                            translationMap[verseNum] = ayah.text;
+                        });
+                    }
+                } catch (e) {
+                    console.log('Quran Cloud API translation fetch failed, using built-in translations');
+                    // Will use translationsDB as fallback
+                }
+
+                // Try to fetch transliteration (latin) from alquran.cloud and convert to русские буквы
+                let translitMapLatin = {};
+                try {
+                    const transRes = await fetch(`https://api.alquran.cloud/v1/surah/${chapterNumber}/en.transliteration`);
+                    if (transRes.ok) {
+                        const transData = await transRes.json();
+                        transData.data?.ayahs?.forEach((ayah, idx) => {
+                            const verseNum = ayah.numberInSurah || (idx + 1);
+                            translitMapLatin[verseNum] = ayah.text;
+                        });
+                    }
+                } catch (e) {
+                    console.log('Transliteration fetch failed:', e);
+                }
+
+                // Convert latin transliteration to approximate Russian letters
+                const translitMapRus = {};
+                Object.keys(translitMapLatin).forEach(k => {
+                    translitMapRus[k] = latinToCyrillic(translitMapLatin[k]);
+                });
+
+                // Store globals for later use (toggle view)
+                currentTranslitMap = translitMapRus;
+                currentArabicVerses = arabicData.verses || [];
+                currentTranslationMapGlobal = translationMap || {};
+
+                displayAyahs(arabicData.verses, translationMap, translitMapRus);
+            } catch (error) {
+                showError('Ошибка при загрузке суры');
+                console.error(error);
+            }
+        }
+
+        function togglePronunciationAll() {
+            if (!currentSurah) return;
+            const container = document.getElementById('surahContainer');
+            if (!currentPronAllShown) {
+                // show concatenated pronunciation
+                if (!currentTranslitMap || Object.keys(currentTranslitMap).length === 0) {
+                    showError('Произношение недоступно для этой суры');
+                    return;
+                }
+
+                let parts = [];
+                const total = currentSurah.verses_count || Object.keys(currentTranslitMap).length;
+                for (let i = 1; i <= total; i++) {
+                    const p = currentTranslitMap[i] || '';
+                    if (p) parts.push(p);
+                }
+                const all = parts.join(' ');
+
+                container.innerHTML = `
+                    <div style="padding:20px; max-width:900px; margin:0 auto;">
+                        <h2 style="text-align:center; color:#667eea;">Произношение — ${currentSurah.id}. ${surahsData[currentSurah.id]?.name || currentSurah.name_arabic}</h2>
+                        <div class="ayah-pronunciation" style="white-space:pre-wrap; text-align:left;">${all}</div>
+                        <div style="text-align:center; margin-top:12px;"><button class="btn" onclick="togglePronunciationAll()">Показать чтение</button></div>
+                    </div>
+                `;
+                currentPronAllShown = true;
+            } else {
+                // restore normal view
+                displayAyahs(currentArabicVerses, currentTranslationMapGlobal, currentTranslitMap);
+                currentPronAllShown = false;
+            }
+        }
+
+        function displayAyahs(arabicVerses, translationMap, translitMapRus = {}) {
+            const container = document.getElementById('surahContainer');
+            const meta = surahsData[currentSurah.id] || {};
+            
+            let html = `
+                <div class="surah-title">
+                    <h2>${meta.name || currentSurah.name_arabic}</h2>
+                    <p style="font-size: 1.1em; color: #666; margin-top: 8px;">${meta.translit || ''}</p>
+                    <div class="surah-info">
+                        <span>📍 Аятов: ${currentSurah.verses_count}</span>
+                        <span>📍 ${currentSurah.revelation_place === 'makkah' ? 'Мекканская' : 'Мединская'}</span>
+                        <span>📖 ${meta.meaning || ''}</span>
+                    </div>
+                    <div style="text-align:center; margin-top:12px;">
+                        <button id="showPronAllBtn" class="btn" onclick="togglePronunciationAll()">Показать только произношение</button>
+                    </div>
+                </div>
+                <div class="ayahs-container">
+            `;
+
+                arabicVerses.forEach((verse, index) => {
+                // Parse verse key to get verse number
+                const verseNumber = verse.verse_number || (verse.verse_key ? verse.verse_key.split(':')[1] : index + 1);
+                const translation = translationMap[verseNumber] || 'Перевод недоступен';
+                const pronunciation = translitMapRus[verseNumber] || 'Произношение недоступно';
+
+                html += `
+                    <div class="ayah">
+                        <div class="ayah-arabic">${verse.text_uthmani}</div>
+                        <div class="ayah-transcription">
+                            <strong>Аят:</strong> ${currentSurah.id}:${verseNumber}<br/>
+                            <strong>Русский перевод:</strong> ${translation}
+                        </div>
+                        <div class="ayah-pronunciation">
+                            <strong>Произношение:</strong> ${pronunciation}
+                        </div>
+                        <span class="ayah-number">${verseNumber}</span>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Простая аппроксимация трансформации латинской транслитерации в русские буквы
+        function latinToCyrillic(text) {
+            if (!text) return '';
+            let s = text.toLowerCase();
+
+            // Заменяем наиболее частые сочетания сначала
+            const rules = [
+                ['sh', 'ш'], ['kh', 'х'], ['gh', 'г'], ['ch', 'ч'], ['th', 'с'], ['dh', 'з'],
+                ['aa', 'а'], ['ā', 'а'], ['ī', 'и'], ['ū', 'у'], ['a', 'а'], ['i', 'и'], ['u', 'у'],
+                ['e', 'э'], ['o', 'о'], ['y', 'й'], ['q', 'к'], ['j', 'дж'], ['w', 'в'],
+            ];
+
+            rules.forEach(([from, to]) => {
+                s = s.split(from).join(to);
+            });
+
+            // Простейшая замена одиночных латинских букв на кириллицу
+            const map = {
+                'b':'б','t':'т','d':'д','r':'р','z':'з','s':'с','f':'ф','k':'к','l':'л','m':'м','n':'н','h':'х','p':'п','v':'в','g':'г','c':'к'
+            };
+            s = s.split('').map(ch => map[ch] || ch).join('');
+
+            // Убираем лишние пробелы и символы
+            s = s.replace(/[^а-яё0-9\-\s\.\,\'\"]+/g, '');
+            s = s.replace(/\s{2,}/g, ' ').trim();
+            return s;
+        }
+
+        async function loadSurahInfo(surah) {
+            const meta = surahsData[surah.id] || {};
+            const infoContainer = document.getElementById('surahInfo');
+            const revelation = surah.revelation_place === 'makkah' ? 'Мекканская' : 'Мединская';
+            
+            infoContainer.innerHTML = `
+                <div style="max-width: 800px;">
+                    <h3 style="color: #667eea; margin-bottom: 20px; font-size: 1.5em;">${meta.name || surah.name_arabic}</h3>
+                    <p style="margin-bottom: 15px; font-size: 1.05em;">
+                        <strong>Английское название:</strong> ${meta.translit || surah.name}
+                    </p>
+                    <p style="margin-bottom: 15px; font-size: 1.05em;">
+                        <strong>Значение:</strong> ${meta.meaning || ''}
+                    </p>
+                    <p style="margin-bottom: 15px; font-size: 1.05em;">
+                        <strong>Номер суры:</strong> ${surah.id}
+                    </p>
+                    <p style="margin-bottom: 15px; font-size: 1.05em;">
+                        <strong>Количество аятов:</strong> ${surah.verses_count}
+                    </p>
+                    <p style="margin-bottom: 15px; font-size: 1.05em;">
+                        <strong>Место откровения:</strong> ${revelation}
+                    </p>
+                </div>
+            `;
+        }
+
+        async function loadAudio(chapterNumber) {
+            try {
+                const response = await fetch(
+                    `${API_BASE}/chapter_recitations?language=${currentReciter}`
+                );
+                const data = await response.json();
+                
+                if (data.recitations && data.recitations.length > 0) {
+                    const recitation = data.recitations[0];
+                    if (recitation.chapter_audios) {
+                        const audio = recitation.chapter_audios.find(
+                            a => a.chapter_number === chapterNumber
+                        );
+                        if (audio && audio.url) {
+                            displayAudioPlayer(audio.url);
+                        } else {
+                            console.log('Audio not found for chapter', chapterNumber);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка при загрузке аудио:', error);
+            }
+        }
+
+        function displayAudioPlayer(audioUrl) {
+            const playerContainer = document.getElementById('playerContainer');
+            playerContainer.innerHTML = `
+                <div style="background: #f0f0f0; padding: 20px; border-radius: 10px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🔊 Рецитация суры</h3>
+                    <audio controls style="width: 100%;" controlsList="nodownload">
+                        <source src="${audioUrl}" type="audio/mpeg">
+                        Ваш браузер не поддерживает элемент audio
+                    </audio>
+                </div>
+            `;
+        }
+
+        function loadYoutubeLink(surah) {
+            const meta = surahsData[surah.id] || {};
+            const youtubeContainer = document.getElementById('youtubeContainer');
+            const searchQuery = `${meta.name || surah.name_arabic} коран рецитация`;
+            const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+            
+            youtubeContainer.innerHTML = `
+                <a href="${youtubeUrl}" target="_blank" rel="noopener noreferrer">
+                    🎥 Слушать на YouTube
+                </a>
+            `;
+        }
+
+        function changeReciter() {
+            currentReciter = document.getElementById('reciterSelect').value;
+            if (currentSurah) {
+                loadAudio(currentSurah.id);
+            }
+        }
+
+        function setupTabButtons() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabName = btn.dataset.tab;
+                    switchTab(tabName);
+                    
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    btn.classList.add('active');
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.innerHTML = `<div class="error">${message}</div>`;
+            setTimeout(() => {
+                errorDiv.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
